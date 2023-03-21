@@ -1,0 +1,88 @@
+modules:
+  jira:globalPage:
+    - key: auth-test-hello-world-page
+      resource: main
+      resolver:
+        function: resolver
+      title: AUTH-TEST
+      resources:
+        - key: connect-cdn
+          url: https://connect-cdn.atl-paas.net/all.js
+          location: header
+  function:
+    - key: resolver
+      handler: index.handler
+      providers:
+        auth:
+          - google
+resources:
+  - key: main
+    path: static/hello-world/build
+app:
+  id: ari:cloud:ecosystem::app/21a93e5f-f056-45bd-9c65-1ba3b4c1b153
+remotes:
+  - key: google-apis
+    baseUrl: https://www.googleapis.com
+  - key: google-account
+    baseUrl: https://accounts.google.com
+  - key: google-oauth
+    baseUrl: https://oauth2.googleapis.com
+permissions:
+  external:
+    fetch:
+      backend:
+        - https://www.googleapis.com
+        - https://oauth2.googleapis.com
+        - https://accounts.google.com
+        - https://id.atlassian.com/login?continue=https%3A%2F%2Fauth.atlassian.com%2Fauthorize%3Faudience%3Dapi.atlassian.com%26client_id%3D9lKyG3MXQxbjzMPtnOui5khBSFtocmCV%26scope%3Dread%253Ame%2520read%253Aaccount%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A8080%252Ftest%252F%26state%3D124351554554545281%26response_type%3Dcode%26native%3Dtrue
+  scopes:
+    - read:jira-work
+    - read:jira-user
+    - read:role:jira
+    - read:project.email:jira
+    - read:user.property:jira
+    - read:user.columns:jira
+    - read:user:jira
+    - write:project:jira
+    - read:project:jira
+    - manage:jira-configuration
+    - read:issue-type:jira
+    - read:project:jira
+    - read:project.property:jira
+    - read:user:jira
+    - read:application-role:jira
+    - read:avatar:jira
+    - read:group:jira
+    - read:issue-type-hierarchy:jira
+    - read:project-category:jira
+    - read:project-version:jira 
+    - read:project.component:jira
+providers:
+  auth:
+    - key: google
+      name: Google
+      scopes:
+        - 'profile'
+        - 'https://www.googleapis.com/auth/userinfo.email'
+      type: oauth2
+      clientId: 946125858550-3t37m7sd5ho2oia4br8ch3i3caf7gpt7.apps.googleusercontent.com
+      remotes:
+        - google-apis
+      bearerMethod: authorization-header
+      actions:
+        authorization:
+          remote: google-account
+          path: /o/oauth2/v2/auth
+        exchange:
+          remote: google-oauth
+          path: /token
+        revokeToken:
+          remote: google-oauth
+          path: /revoke
+        retrieveProfile:
+          remote: google-apis
+          path: /userinfo/v2/me
+          resolvers:
+            id: id
+            displayName: email
+            avatarUrl: picture
